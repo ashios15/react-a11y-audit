@@ -1,0 +1,43 @@
+{
+  "name": "@ashishjoshi/react-a11y-audit",
+  "version": "1.0.0",
+  "description": "React accessibility audit hooks & components — automated WCAG 2.2 checks, live violation overlay, and CI-ready JSON reports",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "test": "vitest",
+    "lint": "eslint src/"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "axe-core": "^4.9.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0",
+    "@testing-library/react": "^16.0.0",
+    "jsdom": "^25.0.0"
+  },
+  "keywords": [
+    "react",
+    "accessibility",
+    "a11y",
+    "wcag",
+    "axe",
+    "audit"
+  ],
+  "license": "MIT"
+}
