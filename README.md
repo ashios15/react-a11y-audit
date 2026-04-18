@@ -7,19 +7,10 @@ Drop-in **React accessibility audit toolkit** powered by [axe-core](https://gith
 ![WCAG](https://img.shields.io/badge/WCAG-2.2_AA-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?logo=typescript)
 
-## Why This Project
-
-Accessibility is a **top hiring signal** for senior frontend engineers. This project proves:
-
-- Deep knowledge of **WCAG 2.2** guidelines (A, AA, AAA levels)
-- Ability to build **developer tools** that improve team-wide quality
-- Understanding of **axe-core** internals and rule customization
-- Experience generating **CI-ready audit reports** (JSON + Markdown)
-
 ## Quick Start
 
 ```tsx
-import { useA11yAudit, A11yOverlay } from "@ashishjoshi/react-a11y-audit";
+import { useA11yAudit, A11yOverlay } from "@ashios15/react-a11y-audit";
 
 function App() {
   const { result, isRunning, rerun, score } = useA11yAudit({
@@ -68,7 +59,7 @@ src/
 
 ```bash
 # In your test suite
-import { runAudit, generateReport } from "@ashishjoshi/react-a11y-audit";
+import { runAudit, generateReport } from "@ashios15/react-a11y-audit";
 
 test("page meets WCAG AA", async () => {
   const result = await runAudit({ level: "AA" });
