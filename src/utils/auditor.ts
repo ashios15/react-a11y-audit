@@ -1,32 +1,58 @@
-import axe, { type AxeResults, type RunOptions } from "axe-core";
+import axe, { type AxeResults, type ElementContext, type RunOptions } from "axe-core";
 import type { AuditResult, AuditOptions, Violation } from "../types";
 
 function mapWcagLevel(level: "A" | "AA" | "AAA"): string[] {
-  const tags = ["wcag2a", "best-practice"];
-  if (level === "AA" || level === "AAA") tags.push("wcag2aa", "wcag21aa");
-  if (level === "AAA") tags.push("wcag2aaa", "wcag21aaa");
+  const tags = ["wcag2a", "wcag21a", "best-practice"];
+  if (level === "AA" || level === "AAA") {
+    tags.push("wcag2aa", "wcag21aa", "wcag22aa");
+  }
+  if (level === "AAA") {
+    tags.push("wcag2aaa", "wcag21aaa");
+  }
   return tags;
 }
 
+const VALID_IMPACTS = new Set<Violation["impact"]>([
+  "critical",
+  "serious",
+  "moderate",
+  "minor",
+]);
+
+function coerceImpact(impact: string | null | undefined): Violation["impact"] {
+  if (impact && VALID_IMPACTS.has(impact as Violation["impact"])) {
+    return impact as Violation["impact"];
+  }
+  return "minor";
+}
+
 export async function runAudit(options: AuditOptions = {}): Promise<AuditResult> {
+  if (typeof document === "undefined") {
+    throw new Error(
+      "[@ashios15/react-a11y-audit] runAudit() requires a DOM. For CI, use the a11y-baseline CLI with a browser runner."
+    );
+  }
+
   const { level = "AA", rules, scope } = options;
 
   const runOptions: RunOptions = {
-    runOnly: {
-      type: "tag",
-      values: mapWcagLevel(level),
-    },
-    rules: rules
-      ? Object.fromEntries(rules.map((r) => [r, { enabled: true }]))
-      : undefined,
+    runOnly: { type: "tag", values: mapWcagLevel(level) },
+    ...(rules && rules.length > 0
+      ? {
+          rules: Object.fromEntries(rules.map((r) => [r, { enabled: true }])),
+        }
+      : {}),
   };
 
-  const context = scope ? { include: [scope] } : document;
-  const results: AxeResults = await axe.run(context as any, runOptions);
+  const context: ElementContext = scope
+    ? { include: [[scope]] }
+    : document;
+
+  const results: AxeResults = await axe.run(context, runOptions);
 
   const violations: Violation[] = results.violations.map((v) => ({
     id: v.id,
-    impact: v.impact as Violation["impact"],
+    impact: coerceImpact(v.impact),
     description: v.description,
     help: v.help,
     helpUrl: v.helpUrl,
@@ -46,7 +72,7 @@ export async function runAudit(options: AuditOptions = {}): Promise<AuditResult>
     passes: results.passes.length,
     incomplete: results.incomplete.length,
     timestamp: new Date().toISOString(),
-    url: window.location.href,
+    url: typeof window !== "undefined" ? window.location.href : "about:blank",
     score,
   };
 }
@@ -65,6 +91,7 @@ export function generateReport(result: AuditResult): string {
 
   if (result.violations.length === 0) {
     lines.push("No violations found.");
+    return lines.join("\n");
   }
 
   for (const v of result.violations) {
